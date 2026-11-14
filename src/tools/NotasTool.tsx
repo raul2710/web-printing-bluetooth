@@ -6,7 +6,8 @@ import {
   AlignCenter,
   AlignRight,
   Bold,
-  Italic
+  Italic,
+  Type
 } from 'lucide-react';
 
 interface NotasToolProps {
@@ -15,14 +16,13 @@ interface NotasToolProps {
 }
 
 type TextAlignment = 'left' | 'center' | 'right';
-type FontSize = 'P' | 'M' | 'G' | 'GG';
 
 export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight }) => {
   const [noteTitle, setNoteTitle] = useState<string>('LISTA DO DIA');
   const [noteContent, setNoteContent] = useState<string>(
     '[ ] Comprar frutas e pão\n[ ] Regar as plantinhas\n[x] Brincar com as crianças\n[ ] Ligar a mini impressora'
   );
-  const [fontSize, setFontSize] = useState<FontSize>('M');
+  const [fontSize, setFontSize] = useState<number>(18);
   const [alignment, setAlignment] = useState<TextAlignment>('left');
   const [isBold, setIsBold] = useState<boolean>(false);
   const [isItalic, setIsItalic] = useState<boolean>(false);
@@ -39,8 +39,8 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
     if (!canvasRef.current) return;
     const W = 384;
 
-    const fontPx = fontSize === 'P' ? 16 : fontSize === 'M' ? 20 : fontSize === 'G' ? 26 : 32;
-    const lineSpacing = fontPx * 1.4;
+    const fontPx = fontSize;
+    const lineSpacing = Math.round(fontPx * 1.4);
 
     const fontFace =
       fontFamily === 'mono'
@@ -269,23 +269,36 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
           <span>Tipografia & Alinhamento</span>
         </span>
 
-        {/* Tamanho e Fonte */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1 bg-emerald-50/70 p-1 rounded-xl border border-emerald-200 text-xs">
-            <span className="text-emerald-700 px-1 text-[11px] font-extrabold">Tam:</span>
-            {(['P', 'M', 'G', 'GG'] as const).map((s) => (
-              <button
-                key={s}
-                onClick={() => setFontSize(s)}
-                className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs transition active:scale-95 ${
-                  fontSize === s ? 'bg-emerald-600 text-white shadow-sm' : 'text-emerald-800 hover:text-emerald-950'
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+        {/* Slider de Tamanho da Fonte (10px até 26px) */}
+        <div className="bg-emerald-50/80 p-3 rounded-2xl border border-emerald-200/90 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-emerald-950 flex items-center gap-1.5">
+              <Type className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Tamanho da Fonte</span>
+            </span>
+            <span className="font-mono text-xs font-black bg-white px-2.5 py-0.5 rounded-lg border border-emerald-300 text-emerald-800 shadow-xs">
+              {fontSize}px
+            </span>
           </div>
 
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-emerald-700 font-mono">10</span>
+            <input
+              type="range"
+              min={10}
+              max={26}
+              step={1}
+              value={fontSize}
+              onChange={(e) => setFontSize(Number(e.target.value))}
+              className="w-full h-2 bg-emerald-200/90 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+            />
+            <span className="text-[10px] font-bold text-emerald-700 font-mono">26</span>
+          </div>
+        </div>
+
+        {/* Família da Fonte */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-bold text-slate-600">Estilo da Letra:</span>
           <div className="flex items-center gap-1 bg-teal-50/70 p-1 rounded-xl border border-teal-200 text-xs">
             {(
               [
