@@ -8,7 +8,7 @@ interface ReceiptPreviewProps {
 }
 
 export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ canvasRef, height }) => {
-  const { isConnected, isPrinting, printProgress, statusMessage, printCanvas, feedPaper, cancelPrint } = usePrinter();
+  const { isConnected, isPrinting, printProgress, statusMessage, printCanvas, feedPaper, cancelPrint, paperWidth } = usePrinter();
 
   const handlePrint = async () => {
     if (!canvasRef.current) return;
@@ -35,8 +35,10 @@ export const ReceiptPreview: React.FC<ReceiptPreviewProps> = ({ canvasRef, heigh
           </span>
           <span>Bobina de Impressão</span>
         </span>
-        <span className="font-mono text-[11px] bg-amber-50/80 px-2.5 py-0.5 rounded-full border border-amber-200 text-amber-800 font-semibold">
-          384 × {height}px (~{estimatedMm} mm)
+        <span className="font-mono text-[11px] bg-amber-50/80 px-2.5 py-0.5 rounded-full border border-amber-200 text-amber-800 font-semibold flex items-center gap-1.5">
+          <span>{paperWidth}</span>
+          <span>•</span>
+          <span>384 × {height}px (~{estimatedMm} mm)</span>
         </span>
       </div>
 

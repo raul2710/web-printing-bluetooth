@@ -5,6 +5,7 @@ import { FotoTool } from './tools/FotoTool';
 import { SudokuTool } from './tools/SudokuTool';
 import { OraculoTool } from './tools/OraculoTool';
 import { NotasTool } from './tools/NotasTool';
+import { CanvasDesignerTool } from './tools/CanvasDesignerTool';
 import { PassatemposTool } from './tools/PassatemposTool';
 import {
   Camera,
@@ -12,6 +13,7 @@ import {
   Sparkles,
   FileText,
   Palette,
+  LayoutGrid,
   ChevronRight,
   Printer,
   Heart,
@@ -20,7 +22,7 @@ import {
 } from 'lucide-react';
 import { usePrinter } from './bluetooth/PrinterContext';
 
-type ToolType = 'foto' | 'oraculo' | 'sudoku' | 'notas' | 'passatempos';
+type ToolType = 'foto' | 'oraculo' | 'sudoku' | 'notas' | 'designer' | 'passatempos';
 
 export default function App() {
   const [activeTool, setActiveTool] = useState<ToolType | null>(null);
@@ -65,6 +67,18 @@ export default function App() {
       shadow: 'shadow-blue-300',
       hoverBorder: 'hover:border-blue-300',
       badge: 'Fácil, Médio e Difícil'
+    },
+    {
+      id: 'designer' as const,
+      title: 'Canvas Livre & Designer',
+      subtitle: 'Arraste e posicione textos, títulos e QR codes onde quiser',
+      icon: LayoutGrid,
+      tag: 'Designer',
+      gradient: 'from-indigo-500 via-purple-500 to-pink-500',
+      badgeBg: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+      shadow: 'shadow-indigo-300',
+      hoverBorder: 'hover:border-indigo-300',
+      badge: '55mm & 58mm Livre'
     },
     {
       id: 'notas' as const,
@@ -249,6 +263,9 @@ export default function App() {
                 )}
                 {activeTool === 'notas' && (
                   <NotasTool canvasRef={canvasRef} setCanvasHeight={setCanvasHeight} />
+                )}
+                {activeTool === 'designer' && (
+                  <CanvasDesignerTool canvasRef={canvasRef} setCanvasHeight={setCanvasHeight} />
                 )}
                 {activeTool === 'passatempos' && (
                   <PassatemposTool canvasRef={canvasRef} setCanvasHeight={setCanvasHeight} />

@@ -23,6 +23,7 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
     '[ ] Comprar frutas e pão\n[ ] Regar as plantinhas\n[x] Brincar com as crianças\n[ ] Ligar a mini impressora'
   );
   const [fontSize, setFontSize] = useState<number>(18);
+  const [marginSide, setMarginSide] = useState<number>(4);
   const [alignment, setAlignment] = useState<TextAlignment>('left');
   const [isBold, setIsBold] = useState<boolean>(false);
   const [isItalic, setIsItalic] = useState<boolean>(false);
@@ -57,7 +58,8 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
     if (!tempCtx) return;
 
     tempCtx.font = fullFontStyle;
-    const maxTextW = W - 40;
+    const effectiveMargin = Math.max(0, marginSide);
+    const maxTextW = Math.max(80, W - effectiveMargin * 2);
 
     const rawParagraphs = noteContent.split('\n');
     const wrappedLines: string[] = [];
@@ -115,8 +117,8 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
       tempCtx.lineWidth = 1;
       tempCtx.setLineDash([4, 3]);
       tempCtx.beginPath();
-      tempCtx.moveTo(20, currentY);
-      tempCtx.lineTo(W - 20, currentY);
+      tempCtx.moveTo(effectiveMargin, currentY);
+      tempCtx.lineTo(W - effectiveMargin, currentY);
       tempCtx.stroke();
       tempCtx.setLineDash([]);
       currentY += 14;
@@ -136,10 +138,10 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
         tempCtx.fillText(line, W / 2, currentY);
       } else if (alignment === 'right') {
         tempCtx.textAlign = 'right';
-        tempCtx.fillText(line, W - 20, currentY);
+        tempCtx.fillText(line, W - effectiveMargin, currentY);
       } else {
         tempCtx.textAlign = 'left';
-        tempCtx.fillText(line, 20, currentY);
+        tempCtx.fillText(line, effectiveMargin, currentY);
       }
 
       currentY += lineSpacing;
@@ -188,8 +190,8 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
 
     tempCtx.setLineDash([3, 3]);
     tempCtx.beginPath();
-    tempCtx.moveTo(20, totalH - 16);
-    tempCtx.lineTo(W - 20, totalH - 16);
+    tempCtx.moveTo(effectiveMargin, totalH - 16);
+    tempCtx.lineTo(W - effectiveMargin, totalH - 16);
     tempCtx.stroke();
     tempCtx.setLineDash([]);
 
@@ -211,6 +213,7 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
     noteTitle,
     noteContent,
     fontSize,
+    marginSide,
     alignment,
     isBold,
     isItalic,
@@ -294,6 +297,37 @@ export const NotasTool: React.FC<NotasToolProps> = ({ canvasRef, setCanvasHeight
             />
             <span className="text-[10px] font-bold text-emerald-700 font-mono">26</span>
           </div>
+        </div>
+
+        {/* Slider de Margem Lateral (0px a 30px) - Permite imprimir até o fim do papel */}
+        <div className="bg-amber-50/80 p-3 rounded-2xl border border-amber-200/90 space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold text-amber-950 flex items-center gap-1.5">
+              <span>📏 Margem Lateral (Bordas)</span>
+            </span>
+            <span className="font-mono text-xs font-black bg-white px-2.5 py-0.5 rounded-lg border border-amber-300 text-amber-800 shadow-xs">
+              {marginSide === 0 ? '0px (Sangrado Total)' : `${marginSide}px`}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-amber-700 font-mono">0px</span>
+            <input
+              type="range"
+              min={0}
+              max={30}
+              step={2}
+              value={marginSide}
+              onChange={(e) => setMarginSide(Number(e.target.value))}
+              className="w-full h-2 bg-amber-200/90 rounded-lg appearance-none cursor-pointer accent-amber-600 focus:outline-none"
+            />
+            <span className="text-[10px] font-bold text-amber-700 font-mono">30px</span>
+          </div>
+          <p className="text-[10px] text-amber-700/90 font-medium">
+            {marginSide === 0
+              ? '✨ 0px selecionado: o texto imprimirá até a borda física máxima da cabeça térmica.'
+              : 'Dica: Coloque em 0px se quiser que o texto ocupe toda a largura do papel de 55mm ou 58mm.'}
+          </p>
         </div>
 
         {/* Família da Fonte */}

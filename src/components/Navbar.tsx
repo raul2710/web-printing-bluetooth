@@ -24,6 +24,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTool, onBackToMenu, toolTi
     deviceName,
     density,
     setDensity,
+    paperWidth,
+    setPaperWidth,
     connect,
     disconnect,
     feedPaper
@@ -71,10 +73,31 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTool, onBackToMenu, toolTi
 
         {/* Lado Direito: Pílulas de Status e Controles */}
         <div className="flex items-center gap-2">
-          {/* Tag de Papel */}
-          <span className="hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-mono font-semibold text-slate-600 bg-amber-50/80 border border-amber-200/80">
-            📏 384 px · 58 mm
-          </span>
+          {/* Seletor Rápido de Bobina de Papel */}
+          <div className="flex items-center bg-amber-50/90 p-0.5 rounded-xl border border-amber-200/90 text-[11px] font-bold">
+            <button
+              onClick={() => setPaperWidth('58mm')}
+              className={`px-2 py-1 rounded-lg transition ${
+                paperWidth === '58mm'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'text-amber-800 hover:text-amber-950'
+              }`}
+              title="Bobina padrão 58mm (384px)"
+            >
+              58mm
+            </button>
+            <button
+              onClick={() => setPaperWidth('55mm')}
+              className={`px-2 py-1 rounded-lg transition ${
+                paperWidth === '55mm'
+                  ? 'bg-amber-500 text-white shadow-xs'
+                  : 'text-amber-800 hover:text-amber-950'
+              }`}
+              title="Bobina estreita 55mm (360px úteis)"
+            >
+              55mm
+            </button>
+          </div>
 
           {/* Botão de Ajustes de Densidade */}
           <div className="relative">

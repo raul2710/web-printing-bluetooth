@@ -10,6 +10,8 @@ import {
   ThermalDensity
 } from './printerProtocol';
 
+export type PaperWidth = '58mm' | '55mm';
+
 export interface PrinterContextType {
   isSupported: boolean;
   isConnected: boolean;
@@ -20,6 +22,8 @@ export interface PrinterContextType {
   printProgress: number;
   density: ThermalDensity;
   setDensity: (density: ThermalDensity) => void;
+  paperWidth: PaperWidth;
+  setPaperWidth: (width: PaperWidth) => void;
   connect: () => Promise<boolean>;
   disconnect: () => void;
   printCanvas: (canvas: HTMLCanvasElement) => Promise<boolean>;
@@ -40,6 +44,7 @@ export const PrinterProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [statusMessage, setStatusMessage] = useState<string>('Pronto');
   const [printProgress, setPrintProgress] = useState<number>(0);
   const [density, setDensity] = useState<ThermalDensity>('normal');
+  const [paperWidth, setPaperWidth] = useState<PaperWidth>('58mm');
 
   // Referências Bluetooth ativas
   const deviceRef = useRef<BluetoothDevice | null>(null);
@@ -293,6 +298,8 @@ export const PrinterProvider: React.FC<{ children: React.ReactNode }> = ({ child
         printProgress,
         density,
         setDensity,
+        paperWidth,
+        setPaperWidth,
         connect,
         disconnect,
         printCanvas,
