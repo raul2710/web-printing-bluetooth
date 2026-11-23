@@ -3,7 +3,7 @@
 export interface ColoringDesign {
   id: string;
   title: string;
-  category: 'animais' | 'fantasia' | 'natureza' | 'arte';
+  category: 'animais' | 'fantasia' | 'natureza' | 'arte' | 'veículos';
   icon: string;
   draw: (ctx: CanvasRenderingContext2D, W: number, H: number) => void;
 }
@@ -570,6 +570,318 @@ export const COLORING_DESIGNS: ColoringDesign[] = [
         ctx.arc(px, py, 16, 0, Math.PI * 2);
         ctx.stroke();
       }
+    }
+  },
+  {
+    id: 'panda',
+    title: 'Ursinho Panda',
+    category: 'animais',
+    icon: '🐼',
+    draw: (ctx, W) => {
+      const cx = W / 2;
+      const cy = 205;
+
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#000000';
+      ctx.fillStyle = '#ffffff';
+
+      // Bambu ao lado
+      const bx = cx - 110;
+      ctx.lineWidth = 2.5;
+      for (let b = 0; b < 3; b++) {
+        const by = cy - 60 + b * 60;
+        ctx.beginPath();
+        ctx.rect(bx, by, 14, 55);
+        ctx.stroke();
+        // Folhas do bambu
+        ctx.beginPath();
+        ctx.ellipse(bx - 12, by + 15, 14, 6, -0.6, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.ellipse(bx + 26, by + 30, 14, 6, 0.6, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Corpo fofinho
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 90, 78, 62, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Barriguinha branca interna
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 95, 52, 42, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Patas inferiores
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(cx - 56, cy + 130, 24, 18, -0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(cx + 56, cy + 130, 24, 18, 0.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Almofadas das patas (para colorir)
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(cx - 56, cy + 130, 9, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx + 56, cy + 130, 9, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Patas superiores (braços)
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.ellipse(cx - 70, cy + 60, 22, 16, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(cx + 70, cy + 60, 22, 16, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Cabeça redonda
+      ctx.beginPath();
+      ctx.arc(cx, cy, 68, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Orelhas pretas com contorno largo
+      ctx.beginPath();
+      ctx.arc(cx - 54, cy - 54, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx + 54, cy - 54, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Interior da orelha para colorir
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx - 54, cy - 54, 13, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx + 54, cy - 54, 13, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Manchas dos olhos do Panda (grandes para colorir)
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.ellipse(cx - 28, cy - 6, 20, 16, -0.3, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(cx + 28, cy - 6, 20, 16, 0.3, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Olhos brilhantes
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx - 25, cy - 6, 8, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx + 25, cy - 6, 8, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(cx - 23, cy - 6, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + 23, cy - 6, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Focinho e Boca
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 18, 12, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + 24);
+      ctx.lineTo(cx, cy + 32);
+      ctx.moveTo(cx, cy + 32);
+      ctx.quadraticCurveTo(cx - 14, cy + 42, cx - 18, cy + 30);
+      ctx.moveTo(cx, cy + 32);
+      ctx.quadraticCurveTo(cx + 14, cy + 42, cx + 18, cy + 30);
+      ctx.stroke();
+
+      // Bochechas fofas (círculos pontilhados)
+      ctx.setLineDash([2, 3]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx - 46, cy + 16, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx + 46, cy + 16, 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  },
+  {
+    id: 'carrinho',
+    title: 'Carro Divertido',
+    category: 'veículos',
+    icon: '🚗',
+    draw: (ctx, W) => {
+      const cx = W / 2;
+      const cy = 200;
+
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#000000';
+      ctx.fillStyle = '#ffffff';
+
+      // Nuvens no céu
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx - 90, cy - 90, 16, 0, Math.PI * 2);
+      ctx.arc(cx - 70, cy - 96, 20, 0, Math.PI * 2);
+      ctx.arc(cx - 50, cy - 90, 16, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Sol sorridente
+      ctx.beginPath();
+      ctx.arc(cx + 100, cy - 90, 20, 0, Math.PI * 2);
+      ctx.stroke();
+      // Raios do sol
+      for (let r = 0; r < 8; r++) {
+        const ang = (Math.PI * 2 / 8) * r;
+        ctx.beginPath();
+        ctx.moveTo(cx + 100 + Math.cos(ang) * 24, cy - 90 + Math.sin(ang) * 24);
+        ctx.lineTo(cx + 100 + Math.cos(ang) * 32, cy - 90 + Math.sin(ang) * 32);
+        ctx.stroke();
+      }
+
+      // Chão / Pista
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(20, cy + 85);
+      ctx.lineTo(W - 20, cy + 85);
+      ctx.stroke();
+
+      // Linhas da pista
+      ctx.setLineDash([8, 8]);
+      ctx.beginPath();
+      ctx.moveTo(30, cy + 110);
+      ctx.lineTo(W - 30, cy + 110);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Chassi / Corpo do Carro
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      // Inicia na frente
+      ctx.moveTo(cx - 130, cy + 50);
+      ctx.quadraticCurveTo(cx - 135, cy + 20, cx - 110, cy + 15);
+      // Capô
+      ctx.lineTo(cx - 50, cy + 12);
+      // Pára-brisa
+      ctx.quadraticCurveTo(cx - 30, cy - 45, cx + 10, cy - 50);
+      // Teto
+      ctx.lineTo(cx + 60, cy - 50);
+      // Vidro traseiro
+      ctx.quadraticCurveTo(cx + 100, cy - 35, cx + 115, cy + 15);
+      // Traseira
+      ctx.quadraticCurveTo(cx + 130, cy + 25, cx + 130, cy + 50);
+      // Base inferior
+      ctx.lineTo(cx - 130, cy + 50);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Janelas (para colorir)
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx - 38, cy + 8);
+      ctx.lineTo(cx - 24, cy - 38);
+      ctx.lineTo(cx + 8, cy - 38);
+      ctx.lineTo(cx + 8, cy + 8);
+      ctx.closePath();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx + 16, cy + 8);
+      ctx.lineTo(cx + 16, cy - 38);
+      ctx.lineTo(cx + 56, cy - 38);
+      ctx.quadraticCurveTo(cx + 85, cy - 25, cx + 96, cy + 8);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Farol dianteiro com feixes
+      ctx.beginPath();
+      ctx.ellipse(cx - 124, cy + 32, 10, 12, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - 140, cy + 26);
+      ctx.lineTo(cx - 156, cy + 22);
+      ctx.moveTo(cx - 140, cy + 34);
+      ctx.lineTo(cx - 158, cy + 34);
+      ctx.moveTo(cx - 140, cy + 42);
+      ctx.lineTo(cx - 156, cy + 46);
+      ctx.stroke();
+
+      // Farol traseiro
+      ctx.beginPath();
+      ctx.ellipse(cx + 124, cy + 32, 7, 10, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Maçanetas das portas
+      ctx.beginPath();
+      ctx.roundRect(cx - 10, cy + 16, 12, 5, 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.roundRect(cx + 36, cy + 16, 12, 5, 2);
+      ctx.stroke();
+
+      // Rodas (2 grandes rodas com calotas para colorir)
+      const wheelR = 30;
+      const leftWx = cx - 72;
+      const rightWx = cx + 72;
+      const wheelY = cy + 55;
+
+      // Recortes do para-lama
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(leftWx, wheelY, wheelR + 8, Math.PI, 0, false);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(rightWx, wheelY, wheelR + 8, Math.PI, 0, false);
+      ctx.stroke();
+
+      // Pneu Esquerdo
+      ctx.beginPath();
+      ctx.arc(leftWx, wheelY, wheelR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // Aro / Calota esquerda
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(leftWx, wheelY, 15, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(leftWx, wheelY, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pneu Direito
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(rightWx, wheelY, wheelR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      // Aro / Calota direita
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(rightWx, wheelY, 15, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(rightWx, wheelY, 5, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
 ];

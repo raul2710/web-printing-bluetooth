@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Palette, Search, RefreshCw, Compass, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Palette, Search, RefreshCw, Compass, Sparkles, Upload, Image as ImageIcon, Sliders, Wand2, Trash2 } from 'lucide-react';
 import { TEMAS_CACA_PALAVRAS, WordSearchTheme } from '../data/wordSearchData';
 import { COLORING_DESIGNS, ColoringDesign } from '../data/coloringDesigns';
 
@@ -8,7 +8,7 @@ interface PassatemposToolProps {
   setCanvasHeight: (h: number) => void;
 }
 
-type PassatempoMode = 'caca-palavras' | 'colorir' | 'mandala';
+type PassatempoMode = 'caca-palavras' | 'colorir' | 'mandala' | 'meu-desenho';
 
 export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, setCanvasHeight }) => {
   const [mode, setMode] = useState<PassatempoMode>('caca-palavras');
@@ -26,6 +26,14 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
   const [mandalaSeed, setMandalaSeed] = useState<number>(() => Math.floor(Math.random() * 99999));
   const [layersCount, setLayersCount] = useState<number>(4);
   const [petalsCount, setPetalsCount] = useState<number>(8);
+
+  // Meu Desenho (Upload da Web / Personalizado)
+  const [customImage, setCustomImage] = useState<HTMLImageElement | null>(null);
+  const [customDrawingTitle, setCustomDrawingTitle] = useState<string>('MEU DESENHO');
+  const [customThreshold, setCustomThreshold] = useState<number>(150);
+  const [customEdgeMode, setCustomEdgeMode] = useState<boolean>(false);
+  const [customInvert, setCustomInvert] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedDesign: ColoringDesign =
     COLORING_DESIGNS.find((d) => d.id === selectedDesignId) || COLORING_DESIGNS[0];
@@ -108,7 +116,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     setPlacedWords(successfullyPlaced);
   }, [gridSize, selectedTheme]);
 
-  // Renderiza o Caça-Palavras com letras MAXIMIZADAS e corte térmico
+  // Renderiza o Caça-Palavras com letras MAXIMIZADAS, sem emotes no tema e com espaçamento harmônico
   const renderWordSearchToCanvas = useCallback(() => {
     if (!canvasRef.current || wordGrid.length === 0 || wordGrid.length !== gridSize) return;
     const W = 384;
@@ -121,11 +129,12 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     const cellSize = size === 8 ? 47 : size === 10 ? 38 : 31;
     const gridTotal = cellSize * size;
     const startX = Math.floor((W - gridTotal) / 2);
-    const startY = 68;
+    const startY = 76;
 
     const wordsListRows = Math.ceil(placedWords.length / 2);
-    const listStartY = startY + gridTotal + 22;
-    const H = listStartY + 42 + wordsListRows * 28 + 36;
+    const listStartY = startY + gridTotal + 26;
+    const footerY = listStartY + 44 + wordsListRows * 30 + 22;
+    const H = footerY + 32;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -157,14 +166,15 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     ctx.textAlign = 'right';
     ctx.fillText('✁', W - 6, 10);
 
-    // Cabeçalho com letras e palavras ampliadas
+    // Cabeçalho com letras e palavras ampliadas e espaçadas
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.font = 'bold 34px "Bebas Neue", sans-serif';
-    ctx.fillText('CAÇA-PALAVRAS', W / 2, 30);
+    ctx.fillText('CAÇA-PALAVRAS', W / 2, 32);
 
-    ctx.font = 'bold 14px Nunito, sans-serif';
-    ctx.fillText(`Tema: ${selectedTheme.nome} (${selectedTheme.icone}) • ${size}×${size}`, W / 2, 48);
+    // Sem emotes no tema impresso para visual limpo
+    ctx.font = 'bold 13px Nunito, sans-serif';
+    ctx.fillText(`Tema: ${selectedTheme.nome} • Grade: ${size}×${size}`, W / 2, 56);
 
     // Letras GRANDES e destacadas
     // 8x8: 28px | 10x10: 24px | 12x12: 20px
@@ -174,7 +184,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
         const x = startX + c * cellSize + cellSize / 2;
-        const y = startY + r * cellSize + cellSize / 2 + 1;
+        const y = startY + r * cellSize + cellSize / 2;
         const letter = wordGrid[r]?.[c] || '';
         ctx.fillText(letter, x, y);
       }
@@ -218,17 +228,17 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     placedWords.forEach((word, idx) => {
       const isLeft = idx % 2 === 0;
       const rowIdx = Math.floor(idx / 2);
-      const itemY = listStartY + 40 + rowIdx * 28;
+      const itemY = listStartY + 44 + rowIdx * 30;
       const x = isLeft ? colLeftX : colRightX;
 
       ctx.textAlign = 'left';
       ctx.fillText(`[ ] ${word}`, x, itemY);
     });
 
-    // Rodapé aumentado
+    // Rodapé aumentado com espaçamento harmônico
     ctx.textAlign = 'center';
     ctx.font = 'bold 12px Nunito, sans-serif';
-    ctx.fillText('★ MiniPrint • Diversão em Família ★', W / 2, H - 22);
+    ctx.fillText('★ MiniPrint • Diversão em Família ★', W / 2, footerY);
 
     // 2. Linha de Corte Inferior
     ctx.lineWidth = 1;
@@ -257,11 +267,11 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     setCanvasHeight(H);
   }, [canvasRef, setCanvasHeight, wordGrid, gridSize, placedWords, selectedTheme]);
 
-  // Renderiza o Desenho Selecionado para Colorir
+  // Renderiza o Desenho Selecionado para Colorir com espaçamento ampliado
   const renderColoringToCanvas = useCallback(() => {
     if (!canvasRef.current) return;
     const W = 384;
-    const H = 450;
+    const H = 460;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -298,21 +308,21 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     ctx.font = 'bold 28px "Bebas Neue", sans-serif';
     ctx.fillText(selectedDesign.title.toUpperCase(), W / 2, 32);
 
-    ctx.font = 'bold 11px Nunito, sans-serif';
-    ctx.fillText('DESENHO PARA COLORIR COM LÁPIS OU GIZ', W / 2, 50);
+    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.fillText('DESENHO PARA COLORIR COM LÁPIS OU GIZ', W / 2, 54);
 
     // Desenha a ilustração vetorial escolhida
     ctx.save();
     selectedDesign.draw(ctx, W, H);
     ctx.restore();
 
-    // Rodapé de Assinatura
-    const footerY = H - 36;
-    ctx.font = 'bold 11px Nunito, sans-serif';
+    // Rodapé de Assinatura com espaçamento harmônico
+    const footerY = H - 42;
+    ctx.font = 'bold 12px Nunito, sans-serif';
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
     ctx.fillText('Colorido por: ____________________________', W / 2, footerY);
-    ctx.fillText('★ MiniPrint • Arte & Imaginação ★', W / 2, footerY + 18);
+    ctx.fillText('★ MiniPrint • Arte & Imaginação ★', W / 2, footerY + 20);
 
     // Linha de Corte Inferior
     ctx.strokeStyle = '#000000';
@@ -341,6 +351,247 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     }
     setCanvasHeight(H);
   }, [canvasRef, setCanvasHeight, selectedDesign]);
+
+  // Renderiza o Meu Desenho (Upload da Web com conversão inteligente para colorir)
+  const renderCustomDrawingToCanvas = useCallback(() => {
+    if (!canvasRef.current) return;
+    const W = 384;
+
+    if (!customImage) {
+      // Estado de espera: convite para o usuário enviar um desenho da internet
+      const H = 400;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = W;
+      tempCanvas.height = H;
+      const ctx = tempCanvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#000000';
+      ctx.strokeStyle = '#000000';
+
+      // Linha superior de corte
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(4, 10);
+      ctx.lineTo(W - 4, 10);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('✁', 6, 10);
+      ctx.textAlign = 'right';
+      ctx.fillText('✁', W - 6, 10);
+
+      // Cabeçalho
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 30px "Bebas Neue", sans-serif';
+      ctx.fillText('MEU DESENHO • PARA COLORIR', W / 2, 34);
+      ctx.font = 'bold 12px Nunito, sans-serif';
+      ctx.fillText('IMPRIMA QUALQUER DESENHO DA INTERNET', W / 2, 58);
+
+      // Caixa central pontilhada
+      ctx.setLineDash([5, 5]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(24, 85, W - 48, 220);
+      ctx.setLineDash([]);
+
+      ctx.font = '42px sans-serif';
+      ctx.fillText('🎨', W / 2, 142);
+      ctx.font = 'bold 16px Nunito, sans-serif';
+      ctx.fillText('ENVIE UMA IMAGEM OU FOTO', W / 2, 195);
+      ctx.font = '12px Nunito, sans-serif';
+      ctx.fillText('Baixe um desenho para colorir na internet', W / 2, 222);
+      ctx.fillText('e envie no botão abaixo para imprimir!', W / 2, 242);
+
+      // Rodapé
+      ctx.font = 'bold 12px Nunito, sans-serif';
+      ctx.fillText('★ MiniPrint Studio • Meu Desenho ★', W / 2, 350);
+
+      // Linha inferior de corte
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(4, H - 8);
+      ctx.lineTo(W - 4, H - 8);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('✁', 6, H - 8);
+      ctx.textAlign = 'right';
+      ctx.fillText('✁', W - 6, H - 8);
+
+      const target = canvasRef.current;
+      if (!target) return;
+      if (target.width !== W) target.width = W;
+      if (target.height !== H) target.height = H;
+      const targetCtx = target.getContext('2d');
+      if (targetCtx) {
+        targetCtx.clearRect(0, 0, W, H);
+        targetCtx.drawImage(tempCanvas, 0, 0);
+      }
+      setCanvasHeight(H);
+      return;
+    }
+
+    // Com imagem carregada: processamento e binarização de alta qualidade
+    const targetW = 360;
+    const aspect = customImage.naturalHeight / (customImage.naturalWidth || 1);
+    const targetH = Math.max(120, Math.min(650, Math.round(targetW * aspect)));
+
+    const startY = 76;
+    const footerY = startY + targetH + 24;
+    const H = footerY + 58;
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = W;
+    tempCanvas.height = H;
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#000000';
+    ctx.strokeStyle = '#000000';
+
+    // Linha superior de corte
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(4, 10);
+    ctx.lineTo(W - 4, 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✁', 6, 10);
+    ctx.textAlign = 'right';
+    ctx.fillText('✁', W - 6, 10);
+
+    // Cabeçalho
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 30px "Bebas Neue", sans-serif';
+    const titleText = (customDrawingTitle.trim() || 'MEU DESENHO').toUpperCase();
+    ctx.fillText(titleText, W / 2, 32);
+
+    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.fillText('DESENHO PARA COLORIR • IMPRESSÃO TÉRMICA', W / 2, 56);
+
+    // Canvas temporário para processar os pixels da imagem
+    const procCanvas = document.createElement('canvas');
+    procCanvas.width = targetW;
+    procCanvas.height = targetH;
+    const procCtx = procCanvas.getContext('2d');
+    if (procCtx) {
+      procCtx.fillStyle = '#ffffff';
+      procCtx.fillRect(0, 0, targetW, targetH);
+      procCtx.drawImage(customImage, 0, 0, targetW, targetH);
+
+      const imgData = procCtx.getImageData(0, 0, targetW, targetH);
+      const data = imgData.data;
+      const w = targetW;
+      const h = targetH;
+
+      if (customEdgeMode) {
+        // Detecção de contornos Sobel (transforma fotos e artes em traços para colorir)
+        const gray = new Float32Array(w * h);
+        for (let i = 0; i < w * h; i++) {
+          const idx = i * 4;
+          gray[i] = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+        }
+
+        const outData = new Uint8ClampedArray(w * h * 4);
+        const edgeThreshold = Math.max(15, 255 - customThreshold);
+
+        for (let y = 1; y < h - 1; y++) {
+          for (let x = 1; x < w - 1; x++) {
+            const idx = y * w + x;
+            const gx =
+              -gray[(y - 1) * w + (x - 1)] + gray[(y - 1) * w + (x + 1)] +
+              -2 * gray[y * w + (x - 1)] + 2 * gray[y * w + (x + 1)] +
+              -gray[(y + 1) * w + (x - 1)] + gray[(y + 1) * w + (x + 1)];
+
+            const gy =
+              -gray[(y - 1) * w + (x - 1)] - 2 * gray[(y - 1) * w + x] - gray[(y - 1) * w + (x + 1)] +
+              gray[(y + 1) * w + (x - 1)] + 2 * gray[(y + 1) * w + x] + gray[(y + 1) * w + (x + 1)];
+
+            const mag = Math.sqrt(gx * gx + gy * gy);
+            let isBlack = mag > edgeThreshold;
+            if (customInvert) isBlack = !isBlack;
+
+            const pIdx = idx * 4;
+            const val = isBlack ? 0 : 255;
+            outData[pIdx] = val;
+            outData[pIdx + 1] = val;
+            outData[pIdx + 2] = val;
+            outData[pIdx + 3] = 255;
+          }
+        }
+        for (let i = 0; i < outData.length; i++) data[i] = outData[i];
+      } else {
+        // Limiarização direta (Thresholding ideal para desenhos com traços baixados da web)
+        for (let i = 0; i < data.length; i += 4) {
+          const luma = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          let isBlack = luma < customThreshold;
+          if (customInvert) isBlack = !isBlack;
+          const val = isBlack ? 0 : 255;
+          data[i] = val;
+          data[i + 1] = val;
+          data[i + 2] = val;
+        }
+      }
+
+      procCtx.putImageData(imgData, 0, 0);
+
+      // Desenha a imagem processada centralizada (12px de margem lateral)
+      ctx.drawImage(procCanvas, 12, startY);
+    }
+
+    // Moldura delicada
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(12, startY, targetW, targetH);
+
+    // Rodapé de assinatura
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.fillText('Colorido por: ____________________________', W / 2, footerY);
+    ctx.fillText('Data: _____ / _____ / ________', W / 2, footerY + 22);
+    ctx.font = 'bold 11px Nunito, sans-serif';
+    ctx.fillText('★ MiniPrint Studio • Meu Desenho ★', W / 2, footerY + 42);
+
+    // Linha inferior de corte
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(4, H - 8);
+    ctx.lineTo(W - 4, H - 8);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('✁', 6, H - 8);
+    ctx.textAlign = 'right';
+    ctx.fillText('✁', W - 6, H - 8);
+
+    const target = canvasRef.current;
+    if (!target) return;
+    if (target.width !== W) target.width = W;
+    if (target.height !== H) target.height = H;
+    const targetCtx = target.getContext('2d');
+    if (targetCtx) {
+      targetCtx.clearRect(0, 0, W, H);
+      targetCtx.drawImage(tempCanvas, 0, 0);
+    }
+    setCanvasHeight(H);
+  }, [canvasRef, setCanvasHeight, customImage, customDrawingTitle, customThreshold, customEdgeMode, customInvert]);
 
   // Renderiza a Mandala Geométrica
   const renderMandalaToCanvas = useCallback(() => {
@@ -481,6 +732,55 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     setCanvasHeight(H);
   }, [canvasRef, setCanvasHeight, mandalaSeed, layersCount, petalsCount]);
 
+  // Manipulador de upload de imagem personalizada da web / celular
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const src = ev.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        setCustomImage(img);
+        const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        if (nameWithoutExt && nameWithoutExt.length <= 25) {
+          setCustomDrawingTitle(nameWithoutExt.toUpperCase());
+        }
+      };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClearImage = () => {
+    setCustomImage(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Carrega exemplo vetorial de desenho para teste imediato
+  const loadSampleDrawing = () => {
+    const sampleSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360" fill="none" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="360" height="360" fill="white" stroke="none"/>
+      <path d="M180,30 L215,120 L310,125 L235,185 L260,280 L180,225 L100,280 L125,185 L50,125 L145,120 Z" fill="white" stroke="black" stroke-width="6"/>
+      <circle cx="155" cy="155" r="8" fill="black"/>
+      <circle cx="205" cy="155" r="8" fill="black"/>
+      <path d="M165,180 Q180,195 195,180" fill="none" stroke="black" stroke-width="4"/>
+      <ellipse cx="140" cy="170" rx="8" ry="5" fill="none" stroke="black" stroke-width="2" stroke-dasharray="2,2"/>
+      <ellipse cx="220" cy="170" rx="8" ry="5" fill="none" stroke="black" stroke-width="2" stroke-dasharray="2,2"/>
+      <path d="M80,60 L85,75 L100,75 L88,85 L92,100 L80,90 L68,100 L72,85 L60,75 L75,75 Z" fill="white" stroke="black" stroke-width="3"/>
+      <path d="M280,70 L284,82 L296,82 L286,90 L290,102 L280,94 L270,102 L274,90 L264,82 L276,82 Z" fill="white" stroke="black" stroke-width="3"/>
+    </svg>`;
+    const blob = new Blob([sampleSvg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      setCustomImage(img);
+      setCustomDrawingTitle('ESTRELA MÁGICA');
+    };
+    img.src = url;
+  };
+
   useEffect(() => {
     if (mode === 'caca-palavras') {
       generateWordSearch();
@@ -492,14 +792,33 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
       renderWordSearchToCanvas();
     } else if (mode === 'colorir') {
       renderColoringToCanvas();
-    } else {
+    } else if (mode === 'mandala') {
       renderMandalaToCanvas();
+    } else if (mode === 'meu-desenho') {
+      renderCustomDrawingToCanvas();
     }
-  }, [mode, wordGrid, placedWords, selectedDesignId, mandalaSeed, layersCount, petalsCount, renderWordSearchToCanvas, renderColoringToCanvas, renderMandalaToCanvas]);
+  }, [
+    mode,
+    wordGrid,
+    placedWords,
+    selectedDesignId,
+    mandalaSeed,
+    layersCount,
+    petalsCount,
+    customImage,
+    customDrawingTitle,
+    customThreshold,
+    customEdgeMode,
+    customInvert,
+    renderWordSearchToCanvas,
+    renderColoringToCanvas,
+    renderMandalaToCanvas,
+    renderCustomDrawingToCanvas,
+  ]);
 
   return (
     <div className="space-y-4">
-      {/* 1 · Escolha a Atividade: 3 Modos Divertidos */}
+      {/* 1 · Escolha a Atividade: 4 Modos Divertidos */}
       <div className="p-4 sm:p-5 rounded-3xl bg-white/90 backdrop-blur-sm border border-purple-100 shadow-card space-y-3">
         <span className="text-xs font-black tracking-tight text-slate-800 uppercase flex items-center gap-2">
           <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 text-white flex items-center justify-center text-[10px] font-mono shadow-sm">
@@ -508,7 +827,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
           <span>Modalidade do Passatempo</span>
         </span>
 
-        <div className="grid grid-cols-3 gap-2 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
           <button
             onClick={() => setMode('caca-palavras')}
             className={`py-3 px-2 rounded-2xl border font-black flex flex-col items-center justify-center gap-1 transition active:scale-95 shadow-sm text-center ${
@@ -535,7 +854,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
             <Palette className="w-4 h-4" />
             <span className="text-xs">Desenhos</span>
             <span className={`text-[9px] font-bold ${mode === 'colorir' ? 'text-pink-100' : 'text-pink-600'}`}>
-              Para Colorir
+              Galeria Pronta
             </span>
           </button>
 
@@ -551,6 +870,21 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
             <span className="text-xs">Mandalas</span>
             <span className={`text-[9px] font-bold ${mode === 'mandala' ? 'text-fuchsia-100' : 'text-fuchsia-600'}`}>
               Geometria
+            </span>
+          </button>
+
+          <button
+            onClick={() => setMode('meu-desenho')}
+            className={`py-3 px-2 rounded-2xl border font-black flex flex-col items-center justify-center gap-1 transition active:scale-95 shadow-sm text-center ${
+              mode === 'meu-desenho'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 border-emerald-600 text-white shadow-md shadow-emerald-300'
+                : 'bg-emerald-50/70 border-emerald-200 text-emerald-700 hover:brightness-95'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            <span className="text-xs">Meu Desenho</span>
+            <span className={`text-[9px] font-bold ${mode === 'meu-desenho' ? 'text-emerald-100' : 'text-emerald-600'}`}>
+              Web / Foto
             </span>
           </button>
         </div>
@@ -680,7 +1014,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
             })}
           </div>
         </div>
-      ) : (
+      ) : mode === 'mandala' ? (
         /* Modo 3: Mandalas Geométricas */
         <div className="p-4 sm:p-5 rounded-3xl bg-white/90 backdrop-blur-sm border border-fuchsia-100 shadow-card space-y-3">
           <span className="text-xs font-black tracking-tight text-slate-800 uppercase flex items-center gap-2">
@@ -735,6 +1069,160 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
               <Sparkles className="w-4 h-4" />
               <span>Gerar Outra Mandala</span>
             </button>
+          </div>
+        </div>
+      ) : (
+        /* Modo 4: Meu Desenho (Upload da Web com Filtro para Colorir) */
+        <div className="p-4 sm:p-5 rounded-3xl bg-white/90 backdrop-blur-sm border border-emerald-100 shadow-card space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black tracking-tight text-slate-800 uppercase flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center text-[10px] font-mono shadow-sm">
+                2
+              </span>
+              <span>Personalizar Meu Desenho para Colorir</span>
+            </span>
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              Papel 58mm (384px)
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-600 font-medium">
+            Imprima qualquer desenho que você encontrou na internet (Google Imagens, Pinterest, etc.) ou foto do celular. O sistema otimiza os traços pretos e brancos para colorir com lápis de cor ou giz de cera!
+          </p>
+
+          {/* Upload e Ações */}
+          <div className="space-y-3">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95"
+              >
+                <Upload className="w-4 h-4" />
+                <span>{customImage ? 'Trocar Imagem do Computador / Celular' : 'Selecionar Imagem do Desenho'}</span>
+              </button>
+
+              {!customImage && (
+                <button
+                  onClick={loadSampleDrawing}
+                  className="py-3 px-3 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center gap-1.5 transition active:scale-95"
+                  title="Carregar exemplo rápido de desenho para colorir"
+                >
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>Testar com Exemplo</span>
+                </button>
+              )}
+
+              {customImage && (
+                <button
+                  onClick={handleClearImage}
+                  className="p-3 rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold text-xs flex items-center justify-center transition active:scale-95"
+                  title="Remover imagem"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Ajuste do Título da Cartela */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-700">Título Impresso no Desenho:</label>
+              <input
+                type="text"
+                value={customDrawingTitle}
+                onChange={(e) => setCustomDrawingTitle(e.target.value)}
+                placeholder="Ex: POKÉMON, PRINCESA, MEU DESENHO"
+                className="w-full px-3 py-2 text-xs font-bold rounded-xl border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 uppercase tracking-wide bg-white"
+                maxLength={30}
+              />
+            </div>
+
+            {/* Configurações de Tratamento de Imagem */}
+            {customImage && (
+              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3 text-xs">
+                <div className="flex items-center gap-2 font-black text-emerald-900">
+                  <Sliders className="w-4 h-4 text-emerald-700" />
+                  <span>Ajustes de Contorno para Impressão Térmica</span>
+                </div>
+
+                {/* Slider de Limiar */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between font-bold text-slate-700">
+                    <span>Espessura do Traço / Limiar:</span>
+                    <span className="font-mono text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200">
+                      {customThreshold}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={40}
+                    max={230}
+                    value={customThreshold}
+                    onChange={(e) => setCustomThreshold(Number(e.target.value))}
+                    className="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-500 font-medium">
+                    <span>Mais fino / claro</span>
+                    <span>Mais grosso / escuro</span>
+                  </div>
+                </div>
+
+                {/* Opções de Modo */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    onClick={() => setCustomEdgeMode(false)}
+                    className={`p-2.5 rounded-xl border font-bold text-left transition flex items-center gap-2 active:scale-95 ${
+                      !customEdgeMode
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                        : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100/50'
+                    }`}
+                  >
+                    <ImageIcon className="w-4 h-4" />
+                    <div>
+                      <div className="text-xs">Traço Direto</div>
+                      <div className={`text-[9px] ${!customEdgeMode ? 'text-emerald-100' : 'text-slate-400'}`}>
+                        Desenhos da Web
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => setCustomEdgeMode(true)}
+                    className={`p-2.5 rounded-xl border font-bold text-left transition flex items-center gap-2 active:scale-95 ${
+                      customEdgeMode
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                        : 'bg-white text-slate-700 border-emerald-200 hover:bg-emerald-100/50'
+                    }`}
+                  >
+                    <Wand2 className="w-4 h-4" />
+                    <div>
+                      <div className="text-xs">Filtro de Bordas</div>
+                      <div className={`text-[9px] ${customEdgeMode ? 'text-emerald-100' : 'text-slate-400'}`}>
+                        Fotos & Ilustrações
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Inverter Cores */}
+                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700 pt-1">
+                  <input
+                    type="checkbox"
+                    checked={customInvert}
+                    onChange={(e) => setCustomInvert(e.target.checked)}
+                    className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-emerald-300"
+                  />
+                  <span className="text-xs">Inverter Preto e Branco (fundo preto para branco)</span>
+                </label>
+              </div>
+            )}
           </div>
         </div>
       )}

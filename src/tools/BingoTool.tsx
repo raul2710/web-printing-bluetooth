@@ -159,7 +159,8 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
     if (!canvasRef.current || cardNumbers.length === 0) return;
     const W = 384;
     const isSmall = maxNumbers <= 20;
-    const H = isSmall ? 430 : 475;
+    // Altura calculada com espaçamentos confortáveis e linhas de corte
+    const H = isSmall ? 412 : 480;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -191,15 +192,15 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
     ctx.textAlign = 'right';
     ctx.fillText('✁', W - 6, 10);
 
-    // Cabeçalho da Cartela com letras e palavras ampliadas
+    // Cabeçalho da Cartela com letras e palavras ampliadas e espaçamento harmônico
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     ctx.font = 'bold 36px "Bebas Neue", sans-serif';
-    ctx.fillText('CARTELA DE BINGO', W / 2, 30);
+    ctx.fillText('CARTELA DE BINGO', W / 2, 32);
 
-    ctx.font = 'bold 14px Nunito, sans-serif';
-    ctx.fillText(`1 a ${maxNumbers} Bolas • Série #${cardSerial}`, W / 2, 49);
+    ctx.font = 'bold 13px Nunito, sans-serif';
+    ctx.fillText(`1 a ${maxNumbers} Bolas • Série #${cardSerial}`, W / 2, 56);
 
     const gridSize = cardNumbers.length; // 3 ou 5
     // Aproveitamento máximo da largura do papel (380px úteis)
@@ -210,7 +211,7 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
     if (!isSmall) {
       // Cartela 5x5 com cabeçalho B - I - N - G - O ocupando a largura total
       const headerH = 38;
-      const startY = 64;
+      const startY = 74;
       const cellH = 58;
       const bingoLetters = ['B', 'I', 'N', 'G', 'O'];
 
@@ -224,6 +225,8 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
         ctx.strokeRect(x, startY, cellW, headerH);
 
         ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         ctx.font = 'bold 30px "Bebas Neue", sans-serif';
         ctx.fillText(bingoLetters[c], x + cellW / 2, startY + headerH / 2 + 1);
       }
@@ -242,6 +245,9 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
           // Retângulo da Célula
           ctx.strokeRect(x, y, cellW, cellH);
 
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
           if (val === 'LIVRE') {
             // Casa central especial FREE / LIVRE
             ctx.fillStyle = '#000000';
@@ -252,20 +258,23 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
           } else if (val !== undefined) {
             ctx.fillStyle = '#000000';
             ctx.font = 'bold 30px "JetBrains Mono", monospace';
-            ctx.fillText(String(val).padStart(2, ' '), x + cellW / 2, y + cellH / 2);
+            // Perfeitamente centralizado para números de 1 ou 2 algarismos
+            ctx.fillText(String(val), x + cellW / 2, y + cellH / 2);
           }
         }
       }
 
-      // Rodapé da Cartela com letras e palavras ampliadas
-      const footerY = numbersStartY + 5 * cellH + 18;
+      // Rodapé da Cartela com letras e palavras ampliadas e espaçadas
+      const footerY = numbersStartY + 5 * cellH + 22;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       ctx.font = 'bold 13px Nunito, sans-serif';
       ctx.fillStyle = '#000000';
       ctx.fillText('Jogador: ________________________________', W / 2, footerY);
-      ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 20);
+      ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 22);
     } else {
       // Cartela 3x3 para 20 números aproveitando a largura total
-      const startY = 68;
+      const startY = 74;
       const cellH = 86;
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 2;
@@ -279,17 +288,21 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
           ctx.strokeRect(x, y, cellW, cellH);
           if (val !== undefined) {
             ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             ctx.font = 'bold 44px "JetBrains Mono", monospace';
             ctx.fillText(String(val), x + cellW / 2, y + cellH / 2);
           }
         }
       }
 
-      const footerY = startY + 3 * cellH + 22;
+      const footerY = startY + 3 * cellH + 24;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       ctx.font = 'bold 13px Nunito, sans-serif';
       ctx.fillStyle = '#000000';
       ctx.fillText('Jogador: ________________________________', W / 2, footerY);
-      ctx.fillText('★ BINGO INFANTIL • BOA SORTE! ★', W / 2, footerY + 20);
+      ctx.fillText('★ BINGO INFANTIL • BOA SORTE! ★', W / 2, footerY + 22);
     }
 
     // 2. Linha Inferior de Corte (sem moldura nas laterais)
@@ -297,16 +310,16 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    ctx.moveTo(4, H - 10);
-    ctx.lineTo(W - 4, H - 10);
+    ctx.moveTo(4, H - 8);
+    ctx.lineTo(W - 4, H - 8);
     ctx.stroke();
     ctx.setLineDash([]);
 
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('✁', 6, H - 10);
+    ctx.fillText('✁', 6, H - 8);
     ctx.textAlign = 'right';
-    ctx.fillText('✁', W - 6, H - 10);
+    ctx.fillText('✁', W - 6, H - 8);
 
     // Copia para o canvas compartilhado do preview
     const target = canvasRef.current;

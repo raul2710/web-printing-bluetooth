@@ -54,7 +54,8 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
   const renderSudoku = useCallback(() => {
     if (!canvasRef.current || puzzleBoard.length === 0) return;
     const W = 384;
-    const H = 485;
+    // Altura ajustada para acomodar cabeçalho espaçado e grade maximizada de 378px
+    const H = 512;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -86,35 +87,38 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
     ctx.textAlign = 'right';
     ctx.fillText('✁', W - 6, 10);
 
-    // Cabeçalho aumentado e destacado
+    // Cabeçalho aumentado, destacado e com espaçamento harmônico
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     ctx.font = 'bold 36px "Bebas Neue", sans-serif';
-    ctx.fillText('SUDOKU', W / 2, 30);
+    ctx.fillText('SUDOKU', W / 2, 32);
 
     const diffName = difficulty === 'facil' ? 'FÁCIL' : difficulty === 'medio' ? 'MÉDIO' : 'DIFÍCIL';
     const today = new Date().toLocaleDateString('pt-BR');
-    ctx.font = 'bold 14px Nunito, sans-serif';
-    ctx.fillText(`Nível: ${diffName} • ${today}`, W / 2, 50);
+    ctx.font = 'bold 13px Nunito, sans-serif';
+    ctx.fillText(`Nível: ${diffName} • ${today}`, W / 2, 56);
 
     // Aproveitamento máximo da largura útil da cabeça térmica (378px)
-    // 378 / 9 = 42px por célula! (Aumenta de 38px para 42px!)
+    // 378 / 9 = 42px por célula!
     const cellSize = 42;
     const gridTotal = cellSize * 9; // 378px
     const startX = Math.floor((W - gridTotal) / 2); // 3px
-    const startY = 64;
+    const startY = 74;
 
     const boardToDraw = showSolution ? solutionBoard : puzzleBoard;
 
-    // Números da grade GRANDES e destacados (de 20px para 28px!)
+    // Números da grade GRANDES e centralizados
     ctx.font = 'bold 28px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
         const val = boardToDraw[r]?.[c];
         if (val !== undefined && val !== '') {
           const x = startX + c * cellSize + cellSize / 2;
-          const y = startY + r * cellSize + cellSize / 2 + 1;
+          const y = startY + r * cellSize + cellSize / 2;
           ctx.fillText(String(val), x, y);
         }
       }
@@ -136,14 +140,16 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
       ctx.stroke();
     }
 
-    // Rodapé aumentado
-    const footerY = startY + gridTotal + 16;
+    // Rodapé aumentado com espaçamento harmônico
+    const footerY = startY + gridTotal + 22;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.font = 'bold 13px Nunito, sans-serif';
     ctx.fillStyle = '#000000';
     ctx.fillText('Desafio Sudoku • Preencha de 1 a 9', W / 2, footerY);
 
     ctx.font = 'bold 12px Nunito, sans-serif';
-    ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 18);
+    ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 22);
 
     // 2. Linha Inferior de Corte
     ctx.strokeStyle = '#000000';
