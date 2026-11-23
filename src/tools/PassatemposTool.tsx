@@ -125,7 +125,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
 
     const wordsListRows = Math.ceil(placedWords.length / 2);
     const listStartY = startY + gridTotal + 22;
-    const H = listStartY + 38 + wordsListRows * 26 + 32;
+    const H = listStartY + 42 + wordsListRows * 28 + 36;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -157,13 +157,13 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     ctx.textAlign = 'right';
     ctx.fillText('✁', W - 6, 10);
 
-    // Cabeçalho
+    // Cabeçalho com letras e palavras ampliadas
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = 'bold 30px "Bebas Neue", sans-serif';
+    ctx.font = 'bold 34px "Bebas Neue", sans-serif';
     ctx.fillText('CAÇA-PALAVRAS', W / 2, 30);
 
-    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.font = 'bold 14px Nunito, sans-serif';
     ctx.fillText(`Tema: ${selectedTheme.nome} (${selectedTheme.icone}) • ${size}×${size}`, W / 2, 48);
 
     // Letras GRANDES e destacadas
@@ -201,34 +201,34 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
     // Divisão para lista de palavras
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
-    ctx.moveTo(12, listStartY);
-    ctx.lineTo(W - 12, listStartY);
+    ctx.moveTo(10, listStartY);
+    ctx.lineTo(W - 10, listStartY);
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.font = 'bold 13px Nunito, sans-serif';
+    ctx.font = 'bold 15px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('PALAVRAS PARA ENCONTRAR:', W / 2, listStartY + 14);
+    ctx.fillText('PALAVRAS PARA ENCONTRAR:', W / 2, listStartY + 16);
 
-    // Lista de Palavras em 2 colunas com fonte MAIOR e legível
-    ctx.font = 'bold 14px "JetBrains Mono", monospace';
-    const colLeftX = 28;
-    const colRightX = W / 2 + 14;
+    // Lista de Palavras em 2 colunas com fonte AUMENTADA (16px) e bem legível
+    ctx.font = 'bold 16px "JetBrains Mono", monospace';
+    const colLeftX = 22;
+    const colRightX = W / 2 + 10;
 
     placedWords.forEach((word, idx) => {
       const isLeft = idx % 2 === 0;
       const rowIdx = Math.floor(idx / 2);
-      const itemY = listStartY + 36 + rowIdx * 25;
+      const itemY = listStartY + 40 + rowIdx * 28;
       const x = isLeft ? colLeftX : colRightX;
 
       ctx.textAlign = 'left';
       ctx.fillText(`[ ] ${word}`, x, itemY);
     });
 
-    // Rodapé
+    // Rodapé aumentado
     ctx.textAlign = 'center';
-    ctx.font = 'bold 10px Nunito, sans-serif';
-    ctx.fillText('★ MiniPrint • Diversão em Família ★', W / 2, H - 20);
+    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.fillText('★ MiniPrint • Diversão em Família ★', W / 2, H - 22);
 
     // 2. Linha de Corte Inferior
     ctx.lineWidth = 1;

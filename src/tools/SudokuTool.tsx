@@ -54,7 +54,7 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
   const renderSudoku = useCallback(() => {
     if (!canvasRef.current || puzzleBoard.length === 0) return;
     const W = 384;
-    const H = 490;
+    const H = 485;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -63,37 +63,52 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
     const ctx = tempCanvas.getContext('2d');
     if (!ctx) return;
 
+    // Fundo térmico branco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, W, H);
 
     ctx.fillStyle = '#000000';
     ctx.strokeStyle = '#000000';
 
+    // 1. Linha Superior de Corte (sem moldura externa lateral pesada)
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(4, 10);
+    ctx.lineTo(W - 4, 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('✁', 6, 10);
+    ctx.textAlign = 'right';
+    ctx.fillText('✁', W - 6, 10);
+
+    // Cabeçalho aumentado e destacado
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    ctx.font = 'bold 34px "Bebas Neue", sans-serif';
-    ctx.fillText('SUDOKU', W / 2, 38);
+    ctx.font = 'bold 36px "Bebas Neue", sans-serif';
+    ctx.fillText('SUDOKU', W / 2, 30);
 
     const diffName = difficulty === 'facil' ? 'FÁCIL' : difficulty === 'medio' ? 'MÉDIO' : 'DIFÍCIL';
-    ctx.font = 'bold 13px Nunito, sans-serif';
     const today = new Date().toLocaleDateString('pt-BR');
-    ctx.fillText(`Nível: ${diffName} • ${today}`, W / 2, 66);
+    ctx.font = 'bold 14px Nunito, sans-serif';
+    ctx.fillText(`Nível: ${diffName} • ${today}`, W / 2, 50);
 
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(30, 80);
-    ctx.lineTo(W - 30, 80);
-    ctx.stroke();
-
-    const cellSize = 38;
-    const gridTotal = cellSize * 9;
-    const startX = Math.floor((W - gridTotal) / 2);
-    const startY = 96;
+    // Aproveitamento máximo da largura útil da cabeça térmica (378px)
+    // 378 / 9 = 42px por célula! (Aumenta de 38px para 42px!)
+    const cellSize = 42;
+    const gridTotal = cellSize * 9; // 378px
+    const startX = Math.floor((W - gridTotal) / 2); // 3px
+    const startY = 64;
 
     const boardToDraw = showSolution ? solutionBoard : puzzleBoard;
 
-    ctx.font = 'bold 20px "JetBrains Mono", monospace';
+    // Números da grade GRANDES e destacados (de 20px para 28px!)
+    ctx.font = 'bold 28px "JetBrains Mono", monospace';
     for (let r = 0; r < 9; r++) {
       for (let c = 0; c < 9; c++) {
         const val = boardToDraw[r]?.[c];
@@ -105,9 +120,10 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
       }
     }
 
+    // Linhas da grade (mais grossas nos blocos 3x3)
     for (let i = 0; i <= 9; i++) {
       const isThick = i % 3 === 0;
-      ctx.lineWidth = isThick ? 3 : 1;
+      ctx.lineWidth = isThick ? 3 : 1.2;
 
       ctx.beginPath();
       ctx.moveTo(startX, startY + i * cellSize);
@@ -120,10 +136,30 @@ export const SudokuTool: React.FC<SudokuToolProps> = ({ canvasRef, setCanvasHeig
       ctx.stroke();
     }
 
-    ctx.font = 'bold 12px Nunito, sans-serif';
+    // Rodapé aumentado
+    const footerY = startY + gridTotal + 16;
+    ctx.font = 'bold 13px Nunito, sans-serif';
     ctx.fillStyle = '#000000';
-    ctx.fillText('Desafio Sudoku • Preencha de 1 a 9', W / 2, H - 28);
-    ctx.fillText('★ ★ ★ MiniPrint ★ ★ ★', W / 2, H - 12);
+    ctx.fillText('Desafio Sudoku • Preencha de 1 a 9', W / 2, footerY);
+
+    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 18);
+
+    // 2. Linha Inferior de Corte
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(4, H - 8);
+    ctx.lineTo(W - 4, H - 8);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('✁', 6, H - 8);
+    ctx.textAlign = 'right';
+    ctx.fillText('✁', W - 6, H - 8);
 
     const target = canvasRef.current;
     if (!target) return;

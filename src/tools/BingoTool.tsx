@@ -159,7 +159,7 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
     if (!canvasRef.current || cardNumbers.length === 0) return;
     const W = 384;
     const isSmall = maxNumbers <= 20;
-    const H = isSmall ? 420 : 465;
+    const H = isSmall ? 430 : 475;
 
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = W;
@@ -191,15 +191,15 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
     ctx.textAlign = 'right';
     ctx.fillText('✁', W - 6, 10);
 
-    // Cabeçalho da Cartela
+    // Cabeçalho da Cartela com letras e palavras ampliadas
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    ctx.font = 'bold 30px "Bebas Neue", sans-serif';
+    ctx.font = 'bold 36px "Bebas Neue", sans-serif';
     ctx.fillText('CARTELA DE BINGO', W / 2, 30);
 
-    ctx.font = 'bold 12px Nunito, sans-serif';
-    ctx.fillText(`1 a ${maxNumbers} Bolas • Série #${cardSerial}`, W / 2, 48);
+    ctx.font = 'bold 14px Nunito, sans-serif';
+    ctx.fillText(`1 a ${maxNumbers} Bolas • Série #${cardSerial}`, W / 2, 49);
 
     const gridSize = cardNumbers.length; // 3 ou 5
     // Aproveitamento máximo da largura do papel (380px úteis)
@@ -224,7 +224,7 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
         ctx.strokeRect(x, startY, cellW, headerH);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 28px "Bebas Neue", sans-serif';
+        ctx.font = 'bold 30px "Bebas Neue", sans-serif';
         ctx.fillText(bingoLetters[c], x + cellW / 2, startY + headerH / 2 + 1);
       }
 
@@ -245,24 +245,24 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
           if (val === 'LIVRE') {
             // Casa central especial FREE / LIVRE
             ctx.fillStyle = '#000000';
-            ctx.font = '22px sans-serif';
+            ctx.font = '24px sans-serif';
             ctx.fillText('★', x + cellW / 2, y + cellH / 2 - 9);
-            ctx.font = 'bold 12px Nunito, sans-serif';
+            ctx.font = 'bold 13px Nunito, sans-serif';
             ctx.fillText('LIVRE', x + cellW / 2, y + cellH / 2 + 13);
           } else if (val !== undefined) {
             ctx.fillStyle = '#000000';
-            ctx.font = 'bold 28px "JetBrains Mono", monospace';
+            ctx.font = 'bold 30px "JetBrains Mono", monospace';
             ctx.fillText(String(val).padStart(2, ' '), x + cellW / 2, y + cellH / 2);
           }
         }
       }
 
-      // Rodapé da Cartela
-      const footerY = numbersStartY + 5 * cellH + 16;
-      ctx.font = 'bold 11px Nunito, sans-serif';
+      // Rodapé da Cartela com letras e palavras ampliadas
+      const footerY = numbersStartY + 5 * cellH + 18;
+      ctx.font = 'bold 13px Nunito, sans-serif';
       ctx.fillStyle = '#000000';
       ctx.fillText('Jogador: ________________________________', W / 2, footerY);
-      ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 18);
+      ctx.fillText('★ BOA SORTE • MiniPrint Studio ★', W / 2, footerY + 20);
     } else {
       // Cartela 3x3 para 20 números aproveitando a largura total
       const startY = 68;
@@ -279,17 +279,17 @@ export const BingoTool: React.FC<BingoToolProps> = ({ canvasRef, setCanvasHeight
           ctx.strokeRect(x, y, cellW, cellH);
           if (val !== undefined) {
             ctx.fillStyle = '#000000';
-            ctx.font = 'bold 42px "JetBrains Mono", monospace';
+            ctx.font = 'bold 44px "JetBrains Mono", monospace';
             ctx.fillText(String(val), x + cellW / 2, y + cellH / 2);
           }
         }
       }
 
-      const footerY = startY + 3 * cellH + 20;
-      ctx.font = 'bold 11px Nunito, sans-serif';
+      const footerY = startY + 3 * cellH + 22;
+      ctx.font = 'bold 13px Nunito, sans-serif';
       ctx.fillStyle = '#000000';
       ctx.fillText('Jogador: ________________________________', W / 2, footerY);
-      ctx.fillText('★ BINGO INFANTIL • BOA SORTE! ★', W / 2, footerY + 18);
+      ctx.fillText('★ BINGO INFANTIL • BOA SORTE! ★', W / 2, footerY + 20);
     }
 
     // 2. Linha Inferior de Corte (sem moldura nas laterais)
