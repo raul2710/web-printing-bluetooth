@@ -6,6 +6,7 @@ import { SudokuTool } from './tools/SudokuTool';
 import { OraculoTool } from './tools/OraculoTool';
 import { NotasTool } from './tools/NotasTool';
 import { CanvasDesignerTool } from './tools/CanvasDesignerTool';
+import { BingoTool } from './tools/BingoTool';
 import { PassatemposTool } from './tools/PassatemposTool';
 import {
   Camera,
@@ -14,6 +15,7 @@ import {
   FileText,
   Palette,
   LayoutGrid,
+  Dices,
   ChevronRight,
   Printer,
   Heart,
@@ -22,7 +24,7 @@ import {
 } from 'lucide-react';
 import { usePrinter } from './bluetooth/PrinterContext';
 
-type ToolType = 'foto' | 'oraculo' | 'sudoku' | 'notas' | 'designer' | 'passatempos';
+type ToolType = 'foto' | 'oraculo' | 'sudoku' | 'notas' | 'designer' | 'bingo' | 'passatempos';
 
 export default function App() {
   const [activeTool, setActiveTool] = useState<ToolType | null>(null);
@@ -91,6 +93,18 @@ export default function App() {
       shadow: 'shadow-emerald-300',
       hoverBorder: 'hover:border-emerald-300',
       badge: 'QR Code Local'
+    },
+    {
+      id: 'bingo' as const,
+      title: 'Bingo em Família',
+      subtitle: 'Sorteador de bolas e cartelas B-I-N-G-O até 90 bolas',
+      icon: Dices,
+      tag: 'Bingo',
+      gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
+      badgeBg: 'bg-teal-50 text-teal-700 border-teal-200',
+      shadow: 'shadow-teal-300',
+      hoverBorder: 'hover:border-teal-300',
+      badge: '1 a 90 Bolas'
     },
     {
       id: 'passatempos' as const,
@@ -266,6 +280,9 @@ export default function App() {
                 )}
                 {activeTool === 'designer' && (
                   <CanvasDesignerTool canvasRef={canvasRef} setCanvasHeight={setCanvasHeight} />
+                )}
+                {activeTool === 'bingo' && (
+                  <BingoTool canvasRef={canvasRef} setCanvasHeight={setCanvasHeight} />
                 )}
                 {activeTool === 'passatempos' && (
                   <PassatemposTool canvasRef={canvasRef} setCanvasHeight={setCanvasHeight} />

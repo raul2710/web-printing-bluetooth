@@ -99,7 +99,7 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
   }, [gridSize, selectedTheme]);
 
   const renderWordSearchToCanvas = useCallback(() => {
-    if (!canvasRef.current || wordGrid.length === 0) return;
+    if (!canvasRef.current || wordGrid.length === 0 || wordGrid.length !== gridSize) return;
     const W = 384;
 
     const size = gridSize;
@@ -143,7 +143,8 @@ export const PassatemposTool: React.FC<PassatemposToolProps> = ({ canvasRef, set
       for (let c = 0; c < size; c++) {
         const x = startX + c * cellSize + cellSize / 2;
         const y = startY + r * cellSize + cellSize / 2 + 1;
-        ctx.fillText(wordGrid[r][c], x, y);
+        const letter = wordGrid[r]?.[c] || '';
+        ctx.fillText(letter, x, y);
       }
     }
 
