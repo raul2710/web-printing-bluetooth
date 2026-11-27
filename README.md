@@ -20,9 +20,33 @@ Compatível com modelos como **SC03H, BQ95, MX06, GB01, Cat Printer, Peripage e 
    npm run dev
    ```
 
-3. Acesse `http://localhost:5173/`:
+3. Acesse `http://localhost:5173/web-printing-bluetooth/` (o Vite usa o mesmo `base` da produção):
    - **No Celular (Android):** Abra pelo **Google Chrome** com o Bluetooth e a Localização (GPS) ativados.
    - **No Desktop:** Acesse pelo **Google Chrome** ou **Microsoft Edge** (com suporte à Web Bluetooth API).
+
+---
+
+## 🌐 Deploy no GitHub Pages
+
+O site fica publicado em **https://raul2710.github.io/web-printing-bluetooth/**.
+
+O deploy é automático via **GitHub Actions**: a cada push na branch `main`, o workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) roda `npm ci` e `npm run build`, e publica a pasta `dist/` no Pages. Também pode ser disparado manualmente em **Actions → Deploy para GitHub Pages → Run workflow**.
+
+**Requisitos (apenas uma vez):**
+
+1. Em **Settings → Pages**, defina a origem (Source) como **GitHub Actions**. O workflow tenta habilitar isso sozinho na primeira execução.
+2. O `package-lock.json` precisa estar versionado, pois o workflow usa `npm ci`.
+
+**Detalhes importantes:**
+
+- `vite.config.ts` define `base: '/web-printing-bluetooth/'` — sem esse prefixo os arquivos de `assets/` dariam 404 no Pages. Se o repositório for renomeado ou passar a usar domínio próprio, ajuste essa constante.
+- O Pages serve tudo por **HTTPS**, o que é obrigatório para a **Web Bluetooth API** funcionar (em `http://` fora de `localhost` o navegador bloqueia o Bluetooth).
+- Para testar o build de produção localmente:
+  ```bash
+  npm run build
+  npm run preview
+  ```
+  e acesse `http://localhost:4173/web-printing-bluetooth/`.
 
 ---
 
